@@ -2,8 +2,8 @@ name: Monitor IDX to Email
 
 on:
   schedule:
-    - cron: "*/30 1-10 * * 1-5" # Setiap 30 menit jam kerja
-  workflow_dispatch:
+    - cron: "*/30 1-10 * * 1-5" # Setiap 30 menit jam kerja (Senin-Jumat)
+  workflow_dispatch: # Tombol manual untuk test
 
 jobs:
   run-scraper:
@@ -23,8 +23,9 @@ jobs:
 
       - name: Run Script
         env:
-          # Ubah variabel di sini
-          EMAIL_SENDER: ${{ secrets.louisric8@gmail.com }}
+          # --- BAGIAN INI SUDAH AMAN ---
+          # Kita menyuruh GitHub: "Tolong ambil isi dari kotak rahasia bernama EMAIL_SENDER"
+          EMAIL_SENDER: ${{ secrets.EMAIL_SENDER }}
           EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
           EMAIL_RECIPIENT: ${{ secrets.EMAIL_RECIPIENT }}
         run: python main.py
