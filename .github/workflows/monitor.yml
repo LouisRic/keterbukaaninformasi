@@ -1,0 +1,30 @@
+name: Monitor IDX to Email
+
+on:
+  schedule:
+    - cron: "*/30 1-10 * * 1-5" # Setiap 30 menit jam kerja
+  workflow_dispatch:
+
+jobs:
+  run-scraper:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.9"
+
+      - name: Install Dependencies
+        run: pip install requests
+
+      - name: Run Script
+        env:
+          # Ubah variabel di sini
+          EMAIL_SENDER: ${{ secrets.louisric8@gmail.com }}
+          EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+          EMAIL_RECIPIENT: ${{ secrets.EMAIL_RECIPIENT }}
+        run: python main.py
