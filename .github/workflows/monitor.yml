@@ -2,7 +2,7 @@ name: Monitor IDX to Email
 
 on:
   schedule:
-    - cron: "*/30 1-10 * * 1-5"
+    - cron: "*/30 0-14 * * *"
   workflow_dispatch:
 
 jobs:
