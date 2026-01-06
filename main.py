@@ -1,4 +1,4 @@
-import requests
+import cloudscraper # Library anti-blokir
 import smtplib
 import os
 from datetime import datetime, timedelta
@@ -65,27 +65,19 @@ def send_email_alert(matches):
         print(f"❌ Email failed: {e}")
 
 def check_idx_news():
-    # --- UPDATE PENTING DI SINI (PENYAMARAN BARU) ---
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-        "Accept": "application/json, text/javascript, */*; q=0.01",
-        "Accept-Language": "en-US,en;q=0.9,id;q=0.8",
-        "Referer": "https://www.idx.co.id/id/berita/keterbukaan-informasi/",
-        "X-Requested-With": "XMLHttpRequest",
-        "Sec-Fetch-Dest": "empty",
-        "Sec-Fetch-Mode": "cors",
-        "Sec-Fetch-Site": "same-origin"
-    }
-
+    # Inisialisasi Cloudscraper
+    scraper = cloudscraper.create_scraper() 
+    
     params = {"indexFrom": 0, "pageSize": 50, "year": datetime.now().year, "lang": "id"}
 
-    print("Fetching data from IDX...")
+    print("Fetching data from IDX using Cloudscraper...")
     try:
-        response = requests.get(IDX_API_URL, headers=headers, params=params)
+        # GANTI requests.get DENGAN scraper.get
+        response = scraper.get(IDX_API_URL, params=params)
         
-        # Cek jika masih diblokir
         if response.status_code != 200:
             print(f"Error fetching: {response.status_code} - {response.text[:100]}")
+            # Debug: print headers untuk melihat kenapa diblokir (opsional)
             return
 
         data = response.json()
@@ -98,6 +90,7 @@ def check_idx_news():
     
     # Timezone Adjustment (UTC to WIB)
     now_utc = datetime.utcnow()
+    # Filter 40 menit terakhir
     time_threshold = now_utc - timedelta(minutes=40)
 
     print(f"Checking news published after: {time_threshold.strftime('%H:%M')} UTC")
@@ -109,7 +102,6 @@ def check_idx_news():
         if not pub_date_str: continue
 
         try:
-            # Convert WIB string to UTC datetime object
             published_dt_wib = datetime.strptime(pub_date_str, "%Y-%m-%dT%H:%M:%S")
             published_dt_utc = published_dt_wib - timedelta(hours=7)
         except ValueError:
